@@ -1,16 +1,19 @@
 
 async function searchCountry(countryName) {
-    const country = document.getElementById('country-info');
     const spinner = document.getElementById('loading-spinner');
     const errorMessage = document.getElementById('error-message');
-    const borders = document.getElementById('bordering-countries');
+    const bordering = document.getElementById('bordering-countries');
 
     try {
+
+        bordering.innerHTML = "";
+        errorMessage.textContent = "";
+
         // Show loading spinner
         spinner.classList.remove("hidden");
         // Fetch country data
 
-        const response = await fetch(`https://restcountries.com/v3.1/name/${countryName}`);
+        const response = await fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`);
         const data = await response.json();
         const country = data[0];
         // Update DOM
@@ -27,17 +30,20 @@ async function searchCountry(countryName) {
                 const neighbour_response = await fetch(`https://restcountries.com/v3.1/alpha/${code}`);
                 const cdata = await neighbour_response.json();
                 const borderCountry = cdata[0];
-               borders.innerHTML += `
+        // Update bordering countries section               
+                bordering.innerHTML += `
                     <section class="border-card">
-                        <p>${borderCountry.name}</p>
-                        <img src="${borderCountry.flags.svg}" alt="${borderCountry.name.common} flag" width = "80%">
+                        <p>${borderCountry.name.common}</p>
+                        <img src="${borderCountry.flags.svg}" alt="${borderCountry.name.common} flag" width = "40%">
                     </section>
                 `;
             }
+
         } else {
-            borders.innerHTML = "<p>No bordering countries</p>";
+            bordering.innerHTML = "<p>No bordering countries</p>";
         }  
-        // Update bordering countries section
+
+
     } catch (error) {
         errorMessage.textContent = "Error: " + error.message;
         // Show error message
@@ -45,10 +51,7 @@ async function searchCountry(countryName) {
         spinner.classList.add("hidden")
         // Hide loading spinner
     }
-
-    country = "";
-    errorMessage="";
-    borders.innerHTML="";
+    
 }
 
 // Event listeners
@@ -56,4 +59,11 @@ document.getElementById('search-btn').addEventListener('click', () => {
     const country = document.getElementById('country-input').value;
     searchCountry(country);
 });
+
+document.getElementById('country-input').addEventListener('keypress', (event) => {
+    if (event.key === "Enter") {  
+        const countryName = event.target.value.trim();
+        if (countryName) searchCountry(countryName);
+    }
+})
 
