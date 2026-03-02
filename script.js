@@ -1,13 +1,17 @@
 
 async function searchCountry(countryName) {
+    const country = document.getElementById('country-info');
+    const spinner = document.getElementById('loading-spinner');
+    const errorMessage = document.getElementById('error-message');
+
     try {
         // Show loading spinner
-        const spinner = getElementById('loading-spinner').style.display = "block";
+        spinner.classList.remove("hidden");
         // Fetch country data
-        const country = getElementById('country-info');
 
         const response = await fetch(`https://restcountries.com/v3.1/name/${countryName}`);
         const data = await response.json();
+        const country = data[0];
         // Update DOM
         document.getElementById('country-info').innerHTML = `
             <h2>${country.name.common}</h2>
@@ -17,12 +21,17 @@ async function searchCountry(countryName) {
             <img src="${country.flags.svg}" alt="${country.name.common} flag">
         `;
         // Fetch bordering countries
+
         // Update bordering countries section
     } catch (error) {
+        errorMessage.textContent = "Error: " + error.message;
         // Show error message
     } finally {
+        spinner.classList.add("hidden")
         // Hide loading spinner
     }
+
+    country = "";
 }
 
 // Event listeners
